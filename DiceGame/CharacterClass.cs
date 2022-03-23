@@ -13,7 +13,6 @@ namespace DiceGame
             CharacterName = name;
             health = 100;
             dice = new Dice();
-
         }
 
         public string CharacterName { get => characterName; set => characterName = value; }
