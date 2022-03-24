@@ -4,27 +4,52 @@ using System.Threading;
 
 namespace DiceGame
 {
-    internal class GameManager
+    internal class GameManager 
     {
         private CharacterClass gameChar;
         private List<CharacterClass> enemyList;
         private bool running;
         private int currentEnemy;
         private ConsoleKeyInfo inpKey;
-        private int nOfTargets;
+        private List<int> winResults;
+        private List<int> lossResults;
+        private List<int> tieResults;
+        private GameMode mode;
+        private Menu menu;
+
+        public enum Menu
+        {
+            One,
+            Two,
+            Three
+        };
+
+        private enum GameMode
+        {
+            MainMenu,
+            Running
+        };
+
+        private enum ChangeState
+        {
+            Add, Remove
+        };
 
         public GameManager(CharacterClass gameChar)
         {
             this.gameChar = gameChar;
+            this.menu = Menu.One;
             this.enemyList = new List<CharacterClass>();
+            this.winResults = new List<int>();
+            this.lossResults = new List<int>();
+            this.tieResults = new List<int>();
             this.running = true;
+            this.mode = GameMode.MainMenu;
             this.currentEnemy = 0;
-            this.nOfTargets = 1;
-            this.enemyList.Add(new CharacterClass("One"));
-            this.enemyList.Add(new CharacterClass("Two"));
-            this.enemyList.Add(new CharacterClass("Three"));
-            this.enemyList.Add(new CharacterClass("Four"));
-            this.enemyList.Add(new CharacterClass("Five"));
+            this.enemyList.Add(new CharacterClass(1 + " "));
+            this.winResults.Add(0);
+            this.lossResults.Add(0);
+            this.tieResults.Add(0);
 
         }
 
@@ -34,7 +59,14 @@ namespace DiceGame
             {
                 inpKey = Console.ReadKey();
                 Console.Clear();
-                this.printGameState();
+                switch (mode) {
+                    case GameMode.MainMenu:
+                        menuOption();
+                        break;
+                    case GameMode.Running:
+                        this.printGameState();
+                        break;
+                }
                 Thread.Sleep(50);
             }
             
@@ -46,17 +78,53 @@ namespace DiceGame
             {
                 case ConsoleKey.Spacebar:
                     this.rollTheDice();
+                    this.resultAction();
+                    Console.WriteLine("Press M for menu");
                     Console.WriteLine("Player:" + gameChar.CharacterName);
-                    gameChar.draw();
-                    for(int i = 0; i < nOfTargets; i++)
+                    gameChar.draw(Dice.DrawState.Under);
+                    Console.Write("Current opponent -----");
+                    enemyList[currentEnemy].draw(Dice.DrawState.After);
+                    for (int i = 0; i < enemyList.Count; i++)
                     {
                         Console.WriteLine("Opponent: " + enemyList[i].CharacterName);
-                        enemyList[i].draw();
+                        enemyList[i].draw(Dice.DrawState.Under);
+                        Console.WriteLine("Wins: "+ winResults[i] 
+                            + " Losses: " + lossResults[i] 
+                            + " Ties: " + tieResults[i]);  
                     }   
                     break;
                 case ConsoleKey.A:
                     Console.WriteLine("Adding next opponent");
-                    nOfTargets += 1;
+                    changeOpponent(ChangeState.Add);
+                    break;
+                case ConsoleKey.R:
+                    Console.WriteLine("Removing last opponent");
+                    changeOpponent(ChangeState.Remove);
+                    break;
+                case ConsoleKey.M:
+                    Console.WriteLine("Opening menu");
+                    mode = GameMode.MainMenu;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void changeOpponent(ChangeState state)
+        {
+            switch (state)
+            {
+                case ChangeState.Add:
+                    this.enemyList.Add(new CharacterClass(enemyList.Count + 1 + ""));
+                    this.winResults.Add(0); 
+                    this.lossResults.Add(0); 
+                    this.tieResults.Add(0);
+                    break;
+                case ChangeState.Remove:
+                    this.enemyList.RemoveAt(enemyList.Count - 1);
+                    this.winResults.RemoveAt(winResults.Count - 1);
+                    this.lossResults.RemoveAt(lossResults.Count - 1);
+                    this.tieResults.RemoveAt(tieResults.Count - 1);
                     break;
                 default:
                     break;
@@ -70,21 +138,80 @@ namespace DiceGame
             {
                 enemyList[i].rollTheDice();
             }
-        }
 
-        internal void changeOpponent()
-        {
-            
         }
 
         internal void resultAction()
         {
- 
+            for (int i = 0; i < enemyList.Count; i++)
+            {
+                if (gameChar.getLastRoll() > enemyList[i].getLastRoll())
+                {
+                    winResults[i] += 1;
+                }
+                if (gameChar.getLastRoll() < enemyList[i].getLastRoll())
+                {
+                    lossResults[i] += 1;
+                }
+                if (gameChar.getLastRoll() == enemyList[i].getLastRoll())
+                {
+                    tieResults[i] += 1;
+                }
+            }
         }
 
         internal void menuOption()
         {
-            
+
+            switch (inpKey.Key)
+            {
+                case ConsoleKey.D1:
+                    mode = GameMode.Running;
+                    break;
+                case ConsoleKey.D2:
+                    menu = Menu.Two;
+                    break;
+                case ConsoleKey.D3:
+                    menu = Menu.Three;
+                    break;
+                case ConsoleKey.D4:
+                    running = false;
+                    break;
+                default:
+                    menu = Menu.One;
+                    break;
+            }
+
+            switch (menu)
+            {
+                case Menu.One:
+                    Console.WriteLine("Main Menu");
+                    Console.WriteLine("1. Start Game");
+                    Console.WriteLine("2. Change name");
+                    Console.WriteLine("3. Set Opponents names");
+                    Console.WriteLine("4. Quit game");
+                    break;
+                case Menu.Two:
+                    Console.Write("Enter name:");
+                    string name = Console.ReadLine();
+                    this.gameChar.CharacterName = name;
+                    break;
+                case Menu.Three:
+                    Console.WriteLine("Number of enemies: " + enemyList.Count);
+                    Console.Write("Change enemy number: ");
+                    try
+                    {
+                        int number = Int32.Parse(Console.ReadLine()) - 1;
+                        Console.Write("\nName: ");
+                        string enemyName = Console.ReadLine();
+                        enemyList[number].CharacterName = enemyName;
+                    } catch (Exception e)
+                    {
+                        Console.WriteLine("Sorry, wrong input. " + e.Message);
+                    }
+                    break;
+                
+            }
         }
     }
 }

@@ -22,14 +22,19 @@ namespace DiceGame
             this.health = health;
         }
 
-        internal void draw()
+        internal void draw(Dice.DrawState after)
         {
-            this.dice.draw();
+            this.dice.draw(after);
         }
 
         internal void rollTheDice()
         {
             this.dice.roll();
+        }
+
+        internal int getLastRoll()
+        {
+            return this.dice.Value;
         }
     }
 }
