@@ -4,9 +4,11 @@ namespace DiceGame
 {
     internal class Dice
     {
-        private int value;
+        private int value = 1;
         private int size;
         private static Random random;
+        public  bool dead = false;
+
         public enum DrawState
         {
             After,
@@ -14,6 +16,7 @@ namespace DiceGame
         };
 
         public int Value { get => value; set => this.value = value; }
+        internal bool Dead { get => dead; set => dead = value; }
 
         public Dice()
         {
@@ -47,7 +50,15 @@ namespace DiceGame
         }
         internal void drawUnder()
         {
-            switch (this.value) { 
+            switch (this.value) {
+                case 0:
+                    Console.WriteLine("╔═-------═╗");
+                    Console.WriteLine("|         |");
+                    Console.WriteLine("| D E A D |");
+                    Console.WriteLine("|         |");
+                    Console.WriteLine("╚═-------═╝");
+                    break;
+
                 case 1:
                     Console.WriteLine("╔═════════╗");
                     Console.WriteLine("║         ║");
@@ -97,7 +108,16 @@ namespace DiceGame
         internal void drawAfter()
         {
             switch (this.value)
+
             {
+                case 0:
+                    Console.WriteLine("╔═-------═╗");
+                    Console.WriteLine("|         |");
+                    Console.WriteLine("| D E A D |");
+                    Console.WriteLine("|         |");
+                    Console.WriteLine("╚═-------═╝");
+                    break;
+
                 case 1:
                     string[] one = new string[5];
                     one[0] = "╔═════════╗";

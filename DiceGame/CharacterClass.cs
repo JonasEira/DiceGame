@@ -4,15 +4,15 @@ namespace DiceGame
 {
     internal class CharacterClass
     {
-        private string characterName;
-        private int health;
-        private Dice dice;
+        public string characterName;
+        public int health;
+        public Dice dice;
 
         public CharacterClass(string name)
         {
-            CharacterName = name;
-            health = 100;
-            dice = new Dice();
+            this.CharacterName = name;
+            this.health = 100;
+            this.dice = new Dice();
         }
 
         public string CharacterName { get => characterName; set => characterName = value; }
@@ -29,11 +29,18 @@ namespace DiceGame
 
         internal void rollTheDice()
         {
-            this.dice.roll();
+            if (dice.Value > 0)
+            {
+                this.dice.roll();
+
+            } else
+            {
+                this.dice.Dead = true;
+            }
         }
 
         internal int getLastRoll()
-        {
+        { 
             return this.dice.Value;
         }
     }

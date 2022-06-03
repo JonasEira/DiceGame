@@ -90,7 +90,8 @@ namespace DiceGame
                         enemyList[i].draw(Dice.DrawState.Under);
                         Console.WriteLine("Wins: "+ winResults[i] 
                             + " Losses: " + lossResults[i] 
-                            + " Ties: " + tieResults[i]);  
+                            + " Ties: " + tieResults[i]
+                            + " Health: " + enemyList[i].health);  
                     }   
                     break;
                 case ConsoleKey.A:
@@ -137,6 +138,10 @@ namespace DiceGame
             for(int i = 0; i < enemyList.Count; i++)
             {
                 enemyList[i].rollTheDice();
+                if (enemyList[i].getLastRoll() < gameChar.getLastRoll())
+                {
+                    enemyList[i].changeHealth(enemyList[i].health - 1);
+                }
             }
 
         }
