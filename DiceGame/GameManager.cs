@@ -80,7 +80,8 @@ namespace DiceGame
                     this.rollTheDice();
                     this.resultAction();
                     Console.WriteLine("Press M for menu");
-                    Console.WriteLine("Player:" + gameChar.CharacterName);
+                    Console.WriteLine("Player:" + gameChar.CharacterName
+                        + " Health: " + gameChar.health);
                     gameChar.draw(Dice.DrawState.Under);
                     Console.Write("Current opponent -----");
                     enemyList[currentEnemy].draw(Dice.DrawState.After);
@@ -138,9 +139,12 @@ namespace DiceGame
             for(int i = 0; i < enemyList.Count; i++)
             {
                 enemyList[i].rollTheDice();
-                if (enemyList[i].getLastRoll() < gameChar.getLastRoll())
+                if (enemyList[i].getLastRoll() <= gameChar.getLastRoll())
                 {
                     enemyList[i].changeHealth(enemyList[i].health - 1);
+                } else
+                {
+                    gameChar.changeHealth(gameChar.health - 1);
                 }
             }
 

@@ -20,6 +20,7 @@ namespace DiceGame
 
         public Dice()
         {
+            
             random = new Random();
         }
 
